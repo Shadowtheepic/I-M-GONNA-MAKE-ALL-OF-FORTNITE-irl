@@ -6,6 +6,9 @@ ScreenHeight = 800
 screen = pygame.display.set_mode((ScreenWidth,ScreenHeight))
 clock = pygame.time.Clock()
 green = (0, 255,0)
+blu = (0, 0, 255)
+player = pygame.image.load('player.png')
+
 
 doExit = False
 Px = 0
@@ -14,7 +17,55 @@ Vx = 0
 #constants
 LEFT = 0
 RIGHT = 1
-keys = [False, False]
+SPACE = 2
+keys = [False, False, False]
+
+misslist = list
+justShot = 0
+
+class missile:
+    def __init__(self, xpos, ypos):
+        self.xpos = xpos
+        self.ypos = ypos
+        self.alive = False
+    def move(self):
+        self.ypos -= 5;
+        
+    def draw(self):
+        if alive == true:
+            pygame.draw.rect(screen, (blu), (self.xpos, self.ypos, 10, 10))
+    
+    def kill(self):
+        alive = false
+    
+    def offScreen(self):
+        if self.ypos < 0:
+            return True
+        else:
+            return False
+        
+    def shoot(self, xpos, ypos):
+        self.xpos = xpos
+        self.ypos = ypos
+        self.alive = True
+        
+    def isAlive(self):
+        return alive;
+    
+    def getx(self):
+        return self.xpos
+    def gety(self):
+        return self.ypos
+    
+    
+for i in range(5):
+    misslist.append(missile(Px, Py))
+
+
+
+
+   
+
 while not doExit:
     clock.tick(60)
     
@@ -27,6 +78,8 @@ while not doExit:
                 keys[LEFT]=True
             elif event.key == pygame.K_RIGHT:
                 keys[RIGHT]=True
+            if event.key == pygame.K_SPACE:
+                keys[SPACE] = True
 
             
         if event.type == pygame.KEYUP: #keyboard input
@@ -50,8 +103,26 @@ while not doExit:
     #updating player
     Px += Vx
     
+    if keys[SPACE] == True:
+        for i in range(5):
+            if misslist[i].isAlive == True and justShot < 5:
+                misslist[i].shoot(Px, Py)
+                justShot += 1
+                
+                
+    for i in range(5):
+        if misslist[i].isAlive == True:
+            misslist[i].move
+    
+    for i in range(5):
+        if misslist[i].offScreen == True:
+            misslist[i].kill
+    
     screen.fill((0,0,0))
-    pygame.draw.rect(screen, (green), (Px, Py, 70, 50))
+    screen.blit(player, (Px, Py))
+    for i in range(5):
+        misslist[i].draw
     
     pygame.display.flip()
 pygame.quit()
+
