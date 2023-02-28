@@ -47,6 +47,7 @@ class Wall:
                             print("hit!")
                             self.numHits += 1
                             return False
+        return True
         
 
 walls = []
@@ -166,6 +167,10 @@ while not doExit:
                 bullet.isAlive = walls[i].collide(bullet.xpos, bullet.ypos)
                 if bullet.isAlive == False:
                     break
+        
+        
+                
+       
     
     else:
         bullet.xpos = xpos+28
@@ -190,9 +195,6 @@ while not doExit:
         armada[i].move(timer)
 
     
-    
-                
-    
     screen.fill((0,0,0))
     screen.blit(player, (xpos, ypos))
     for i in range(len(armada)):
@@ -202,10 +204,5 @@ while not doExit:
     bullet.draw()
     
     
-    
     pygame.display.flip()
 pygame.quit()
-
-
-
-
