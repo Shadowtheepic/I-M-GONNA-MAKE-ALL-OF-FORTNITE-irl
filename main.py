@@ -1,4 +1,7 @@
 import pygame
+import random
+import time
+
 pygame.init()
 pygame.display.set_caption("Inchaders")
 ScreenWidth = 800
@@ -7,7 +10,7 @@ screen = pygame.display.set_mode((ScreenWidth,ScreenHeight))
 clock = pygame.time.Clock()
 green = (0, 255,0)
 blu = (0, 0, 255)
-player = pygame.image.load('player.png')
+player = pygame.image.load('I CAN1.gif')
 
 
 doExit = False
@@ -19,7 +22,8 @@ LEFT = 0
 RIGHT = 1
 SPACE = 2
 keys = [False, False, False]
-timer = 0;
+timer = 0
+lives = 3
 
 misslist = list()
 justShot = 0
@@ -63,7 +67,8 @@ class Alien:
         self.isAlive = True
         self.direction = 1
     def draw(self):
-        pygame.draw.rect(screen, (250, 250, 250), (self.xpos, self.ypos, 40, 40))
+        if self.isAlive == True:
+            pygame.draw.rect(screen, (250, 250, 250), (self.xpos, self.ypos, 40, 40))
         
     def move(self, time):
         
@@ -81,8 +86,8 @@ class Alien:
     def collide(self, BulletX, BulletY):
         if self.isAlive:
             if BulletX > self.xpos:
-                if BulletX < self.xpos + 40:
-                    if BulletY < self.ypos + 40:
+                if BulletX < self.xpos + 50:
+                    if BulletY < self.ypos + 20:
                         if BulletY > self.ypos:
                             print("hit!")
                             self.isAlive = False
@@ -121,12 +126,31 @@ class Bullet:
 #instantiate bullet object
 bullet = Bullet(xpos+28, ypos)
 
+class Missile:
+    def __init__(self):
+        self.xpos = -10
+        self.ypos = -10
+        self.isAlive = False
+    def move(self):
+        if self.isAlive == True:
+            self.ypos +=5
+        if self.ypos > 800:
+            self.isAlive = False
+            self.xpos = xpos
+            self.ypos = ypos
+    def draw(self):
+        if self.isAlive == True:
+            pygame.draw.rect(screen, (250, 250, 250), (self.xpos, self.ypos, 2, 10))
+
+misslies = []
+
+for i in range(10):
+    misslies.append(Missile())
+
+        
 
 
-
-   
-
-while not doExit:
+while lives > 0:
     clock.tick(60)
     timer += 1;
     
@@ -175,6 +199,46 @@ while not doExit:
     else:
         bullet.xpos = xpos+28
         bullet.ypos = ypos
+    
+    
+    for i in range(len(walls)):
+        for j in range(len(misslies)):
+            if misslies[j].isAlive == True:
+                if walls[i].collide(misslies[j].xpos, misslies[j].ypos) == False:
+                    misslies[j].isAlive = False
+                    break
+        
+    buffa = random.randrange(100)
+    if buffa < 2:
+        armbruh = random.randrange(len(armada))
+        if armada[armbruh].isAlive == True:
+            for i in range(len(misslies)):
+                if misslies[i].isAlive == False:
+                    misslies[i].isAlive = True
+                    misslies[i].xpos = armada[i].xpos + 5
+                    misslies[i].ypos = armada[i].ypos
+                    break
+                
+    #player collision
+    for i in range(len(misslies)):
+         if misslies[i].isAlive:
+             if misslies[i].xpos > xpos:
+                 if misslies[i].xpos < xpos + 40:
+                     if misslies[i].ypos < ypos + 40:
+                         if misslies[i].ypos > ypos:
+                             lives -= 1
+                             time.sleep(1)
+                             xpos = 0
+                             
+    for i in range(len(armada)):
+            if armada[i].ypos > ypos:
+                        lives -= 3
+                        print("Bruh how did they get this low")
+                        time.sleep(1)
+                        break
+                        
+                             
+    
                 
     #left movement            
     if keys[LEFT]==True:
@@ -193,16 +257,33 @@ while not doExit:
     
     for i in range(len(armada)):
         armada[i].move(timer)
+    for i in range(len(misslies)):
+        misslies[i].move()
 
     
     screen.fill((0,0,0))
+    
+    
+    my_font = pygame.font.SysFont('Comic Sans MS', 30)
+    text_surface = my_font.render('LIVES:', False, (255, 0, 0))
+    number = my_font.render(str(lives), False, (255,0,0))
+    
+    
     screen.blit(player, (xpos, ypos))
     for i in range(len(armada)):
         armada[i].draw()
     for i in range(len(walls)):
         walls[i].draw()
     bullet.draw()
+    for i in range(len(misslies)):
+        misslies[i].draw()
+    
+    screen.blit(text_surface, (0,0))
+    screen.blit(number, (100,0))
     
     
     pygame.display.flip()
+    
+print("RIP")
+
 pygame.quit()
